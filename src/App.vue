@@ -6,6 +6,7 @@ const name = ref('')
 const category = ref([])
 const input_content = ref('')
 const type = ref('')
+const greet_msg = ref('')
 const input_category = ref(null)
 
 const todos_asc = computed(() => todos.value.sort((a,b) =>{
@@ -27,6 +28,17 @@ watch(todos, (newVal) => {
 }, {
 	deep: true
 })
+
+const custom_greet = () => {
+  const time = new Date().getHours()
+  if (time < 12) {
+    greet_msg.value = 'Good morning'
+  } else if (time < 18) {
+    greet_msg.value = 'Good afternoon'
+  } else {
+    greet_msg.value = 'Good evening'
+  }
+}
 
 const add_business_category = () => {
   if (input_category.value.trim() === '' || type.value === null) {
@@ -57,6 +69,7 @@ const removeTodo = (todo) => {
 }
 
 onMounted(() => {
+  custom_greet()
 	name.value = localStorage.getItem('name') || ''
 	todos.value = JSON.parse(localStorage.getItem('todos')) || []
   category.value = JSON.parse(localStorage.getItem('category')) || []
@@ -68,7 +81,7 @@ onMounted(() => {
 		
 		<section class="greeting">
 			<h2 class="title">
-				What's up, <input type="text" id="name" placeholder="Name here" v-model="name">
+				{{ greet_msg }}, <input type="text" id="name" placeholder="Name here" v-model="name">
 			</h2>
 		</section>
 

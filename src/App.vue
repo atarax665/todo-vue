@@ -3,13 +3,20 @@ import { ref, onMounted, computed, watch } from 'vue'
 
 const todos = ref([])
 const name = ref('')
-
+const category = ref([])
 const input_content = ref('')
+const type = ref('')
 const input_category = ref(null)
 
 const todos_asc = computed(() => todos.value.sort((a,b) =>{
 	return a.createdAt - b.createdAt
 }))
+
+watch(category, (newVal) => {
+  localStorage.setItem('category', JSON.stringify(newVal))
+}, {
+  deep: true
+})
 
 watch(name, (newVal) => {
 	localStorage.setItem('name', newVal)
@@ -20,6 +27,16 @@ watch(todos, (newVal) => {
 }, {
 	deep: true
 })
+
+const add_business_category = () => {
+  if (input_category.value.trim() === '' || type.value === null) {
+		return
+	}
+    category.value.push({
+    category: input_category.value,
+    type: type.value,
+  })
+}
 
 const addTodo = () => {
 	if (input_content.value.trim() === '' || input_category.value === null) {
@@ -42,6 +59,7 @@ const removeTodo = (todo) => {
 onMounted(() => {
 	name.value = localStorage.getItem('name') || ''
 	todos.value = JSON.parse(localStorage.getItem('todos')) || []
+  category.value = JSON.parse(localStorage.getItem('category')) || []
 })
 </script>
 
@@ -54,6 +72,33 @@ onMounted(() => {
 			</h2>
 		</section>
 
+    <section class="create-todo">
+      <h3>ADD CATEGORIES</h3>
+      <form id="new-todo-form" @submit.prevent="add_business_category">
+        <input 
+					type="text" 
+					name="content" 
+					id="content" 
+					placeholder="e.g. Workout split"
+					v-model="input_category" />
+
+        <div class="options">
+          <label>
+            <input type="radio" name="type" value="business" v-model="type" />
+            <span class="bubble business"></span>
+            <div>Business</div>
+          </label>
+
+          <label>
+            <input type="radio" name="type" value="personal" v-model="type" />
+            <span class="bubble personal"></span>
+            <div>Personal</div>
+          </label>
+        </div>
+        <input type="submit" value="Add category" />
+      </form>
+    </section>
+
 		<section class="create-todo">
 			<h3>CREATE A TODO</h3>
 
@@ -63,34 +108,20 @@ onMounted(() => {
 					type="text" 
 					name="content" 
 					id="content" 
-					placeholder="e.g. make a video"
+					placeholder="e.g. Learn List rendering"
 					v-model="input_content" />
 				
 				<h4>Pick a category</h4>
-				<div class="options">
-
+				<div class="options" v-for="category in category">
 					<label>
-						<input 
-							type="radio" 
-							name="category" 
-							id="category1" 
-							value="business"
-							v-model="input_category" />
-						<span class="bubble business"></span>
-						<div>Business</div>
-					</label>
-
-					<label>
-						<input 
-							type="radio" 
-							name="category" 
-							id="category2" 
-							value="personal"
-							v-model="input_category" />
-						<span class="bubble personal"></span>
-						<div>Personal</div>
-					</label>
-
+            <input type="radio" name="category" :value="category.type" v-model="input_category" />
+            <span :class="`bubble ${
+              category.type == 'business' 
+                ? 'business' 
+                : 'personal'
+            }`"></span>
+            <div>{{ category.category }}</div>
+          </label>
 				</div>
 
 				<input type="submit" value="Add todo" />

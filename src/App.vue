@@ -56,6 +56,10 @@ const removeTodo = (todo) => {
 	todos.value = todos.value.filter((t) => t !== todo)
 }
 
+const clearCategory = () => {
+  category.value = []
+}
+
 onMounted(() => {
 	name.value = localStorage.getItem('name') || ''
 	todos.value = JSON.parse(localStorage.getItem('todos')) || []
@@ -123,7 +127,7 @@ onMounted(() => {
             <div>{{ category.category }}</div>
           </label>
 				</div>
-
+        <button class="clear" @click="clearCategory" position="right">Clear Category</button>
 				<input type="submit" value="Add todo" />
 			</form>
 		</section>
